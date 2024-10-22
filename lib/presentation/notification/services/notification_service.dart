@@ -118,6 +118,25 @@ class NotificationServices {
     }).toList();
     await prefs.setString('notifications', jsonEncode(updatedNotifications));
   }
+
+  // Menambahkan metode untuk menghapus semua notifikasi
+  Future<void> deleteAllNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('notifications'); // Hapus data notifikasi
+  }
+
+  // Menambahkan metode untuk menghapus notifikasi berdasarkan ID
+  Future<void> deleteNotification(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String notificationsJson = prefs.getString('notifications') ?? '[]';
+    final List<dynamic> notifications = jsonDecode(notificationsJson);
+    final updatedNotifications = notifications.where((notification) {
+      final notificationModel = NotificationModel.fromJson(notification);
+      return notificationModel.id !=
+          id; // Hanya menyimpan notifikasi yang tidak dihapus
+    }).toList();
+    await prefs.setString('notifications', jsonEncode(updatedNotifications));
+  }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
