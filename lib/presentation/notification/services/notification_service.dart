@@ -47,8 +47,8 @@ class NotificationServices {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     await _showLocalNotification(message);
     await _saveNotification(message);
-    onNotificationTap(
-        null); // Update unread count when notification is received
+    // onNotificationTap(
+    //     null); // Update unread count when notification is received
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
