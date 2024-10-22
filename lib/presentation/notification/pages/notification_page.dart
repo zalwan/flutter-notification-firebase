@@ -48,12 +48,9 @@ class _NotificationPageState extends State<NotificationPage> {
               ListTile(
                 leading: const Icon(Icons.delete_forever),
                 title: const Text('Delete All Notifications'),
-                onTap: () async {
-                  await _notificationServices.deleteAllNotifications();
-                  setState(() {
-                    _notifications.clear();
-                  });
+                onTap: () {
                   Navigator.pop(context);
+                  _showDeleteAllConfirmation(); // Tampilkan dialog konfirmasi
                 },
               ),
               ListTile(
@@ -66,6 +63,37 @@ class _NotificationPageState extends State<NotificationPage> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteAllConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content:
+              const Text('Are you sure you want to delete all notifications?'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                await _notificationServices.deleteAllNotifications();
+                setState(() {
+                  _notifications.clear();
+                });
+                Navigator.of(context).pop(); // Tutup dialog setelah menghapus
+              },
+            ),
+          ],
         );
       },
     );
