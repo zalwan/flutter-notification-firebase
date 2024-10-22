@@ -3,24 +3,21 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notification_model.dart';
-import 'package:flutter/material.dart';
 
 class NotificationServices {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // Tambahkan variabel untuk menyimpan fungsi navigasi
   final Function(String?) onNotificationTap;
 
-  // Tambahkan parameter di konstruktor
   NotificationServices({required this.onNotificationTap});
 
   Future<void> init() async {
     // Request permission for iOS devices
     await _firebaseMessaging.requestPermission();
 
-    // Configure FCM
+    // Configure FCM listeners
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -38,13 +35,11 @@ class NotificationServices {
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Handle notification tap
         _handleNotificationTap(response.payload);
       },
     );
   }
 
-  // Implementasi _handleNotificationTap
   void _handleNotificationTap(String? payload) {
     onNotificationTap(payload);
   }
@@ -52,6 +47,8 @@ class NotificationServices {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     await _showLocalNotification(message);
     await _saveNotification(message);
+    onNotificationTap(
+        null); // Update unread count when notification is received
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
@@ -62,7 +59,7 @@ class NotificationServices {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id',
-      'Your Channel Name',
+      'your_channel_name',
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -85,6 +82,7 @@ class NotificationServices {
       title: message.notification?.title ?? '',
       body: message.notification?.body ?? '',
       timestamp: DateTime.now(),
+      isRead: false, // Default to false, meaning it's unread
     );
 
     final String notificationsJson = prefs.getString('notifications') ?? '[]';
@@ -126,7 +124,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle background messages
   final notificationServices =
       NotificationServices(onNotificationTap: (payload) {
-    // Ini tidak akan berfungsi di background, tapi kita tetap perlu menyediakannya
     print('Background message received: $payload');
   });
   await notificationServices._saveNotification(message);

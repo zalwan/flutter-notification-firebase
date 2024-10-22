@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notification_sample/presentation/notification/services/notification_service.dart';
 import 'package:notification_sample/presentation/notification/widgets/notification_icon.dart';
 import '../../notification/pages/notification_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,11 +23,15 @@ class _HomePageState extends State<HomePage> {
     );
     _initNotifications();
     _updateUnreadNotificationCount();
+
+    // Listen to FCM messages when app is in foreground
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      _updateUnreadNotificationCount(); // Update count when new notification arrives
+    });
   }
 
   void _handleNotificationTap(String? payload) {
     // Handle notification tap here
-    print('Notification tapped with payload: $payload');
     Navigator.push(
       context,
       MaterialPageRoute(

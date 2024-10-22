@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 class NotificationModel {
   final String id;
   final String title;
@@ -15,29 +13,20 @@ class NotificationModel {
     this.isRead = false,
   });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      body: json['body'] ?? '',
-      timestamp: json['timestamp'] != null
-          ? DateTime.parse(json['timestamp'])
-          : DateTime.now(),
-      isRead: json['isRead'] ?? false,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'body': body,
+        'timestamp': timestamp.toIso8601String(),
+        'isRead': isRead,
+      };
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'body': body,
-      'timestamp': timestamp.toIso8601String(),
-      'isRead': isRead,
-    };
-  }
-
-  String get formattedTimestamp {
-    return DateFormat('dd/MM/yyyy HH:mm').format(timestamp);
-  }
+  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
+      NotificationModel(
+        id: json['id'],
+        title: json['title'],
+        body: json['body'],
+        timestamp: DateTime.parse(json['timestamp']),
+        isRead: json['isRead'],
+      );
 }
