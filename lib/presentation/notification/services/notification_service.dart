@@ -14,7 +14,7 @@ class NotificationServices {
   NotificationServices({required this.onNotificationTap});
 
   Future<void> init() async {
-    // Request permission for iOS devices
+    // Request permission
     await _firebaseMessaging.requestPermission();
 
     // Configure FCM listeners
@@ -25,9 +25,9 @@ class NotificationServices {
     // Initialize local notifications
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    final DarwinInitializationSettings initializationSettingsIOS =
+    const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings();
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
@@ -47,8 +47,6 @@ class NotificationServices {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     await _showLocalNotification(message);
     await _saveNotification(message);
-    // onNotificationTap(
-    //     null); // Update unread count when notification is received
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
@@ -82,7 +80,6 @@ class NotificationServices {
       title: message.notification?.title ?? '',
       body: message.notification?.body ?? '',
       timestamp: DateTime.now(),
-      isRead: false, // Default to false, meaning it's unread
     );
 
     final String notificationsJson = prefs.getString('notifications') ?? '[]';
@@ -112,35 +109,31 @@ class NotificationServices {
     final updatedNotifications = notifications.map((notification) {
       final notificationModel = NotificationModel.fromJson(notification);
       if (notificationModel.id == id) {
-        notificationModel.isRead = true;
+        return notificationModel.copyWith(isRead: true);
       }
       return notificationModel.toJson();
     }).toList();
     await prefs.setString('notifications', jsonEncode(updatedNotifications));
   }
 
-  // Menambahkan metode untuk menghapus semua notifikasi
   Future<void> deleteAllNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('notifications'); // Hapus data notifikasi
+    await prefs.remove('notifications');
   }
 
-  // Menambahkan metode untuk menghapus notifikasi berdasarkan ID
   Future<void> deleteNotification(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final String notificationsJson = prefs.getString('notifications') ?? '[]';
     final List<dynamic> notifications = jsonDecode(notificationsJson);
     final updatedNotifications = notifications.where((notification) {
       final notificationModel = NotificationModel.fromJson(notification);
-      return notificationModel.id !=
-          id; // Hanya menyimpan notifikasi yang tidak dihapus
+      return notificationModel.id != id;
     }).toList();
     await prefs.setString('notifications', jsonEncode(updatedNotifications));
   }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Handle background messages
   final notificationServices =
       NotificationServices(onNotificationTap: (payload) {
     print('Background message received: $payload');

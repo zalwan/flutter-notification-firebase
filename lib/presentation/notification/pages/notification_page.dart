@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Digunakan untuk format tanggal
 import 'package:notification_sample/presentation/notification/services/notification_service.dart';
 import '../models/notification_model.dart';
 
@@ -12,7 +13,7 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   late NotificationServices _notificationServices;
   List<NotificationModel> _notifications = [];
-  Set<String> _selectedNotifications = {};
+  final Set<String> _selectedNotifications = {};
   bool _isSelectMode = false; // Menandakan apakah dalam mode pemilihan
 
   @override
@@ -117,11 +118,16 @@ class _NotificationPageState extends State<NotificationPage> {
     });
   }
 
+  String _formatTimestamp(DateTime timestamp) {
+    return DateFormat('yyyy-MM-dd HH:mm')
+        .format(timestamp); // Format tanggal dan waktu
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert), // Tombol dot menu
@@ -136,44 +142,81 @@ class _NotificationPageState extends State<NotificationPage> {
               itemBuilder: (context, index) {
                 final notification = _notifications[index];
 
-                return ListTile(
-                  title: Text(notification.title),
-                  subtitle: Text(notification.body),
-                  tileColor: notification.isRead ? null : Colors.grey[200],
-                  onTap: _isSelectMode
-                      ? () {
-                          setState(() {
-                            if (_selectedNotifications
-                                .contains(notification.id)) {
-                              _selectedNotifications.remove(notification.id);
-                            } else {
-                              _selectedNotifications.add(notification.id);
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              notification.title,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8), // Jarak kecil antara teks
+                          Row(children: [
+                            const Icon(
+                              Icons.circle,
+                              color: Colors.grey,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatTimestamp(notification.timestamp),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ])
+                        ],
+                      ),
+                      subtitle: Text(notification.body),
+                      tileColor: notification.isRead ? null : Colors.grey[200],
+                      onTap: _isSelectMode
+                          ? () {
+                              setState(() {
+                                if (_selectedNotifications
+                                    .contains(notification.id)) {
+                                  _selectedNotifications
+                                      .remove(notification.id);
+                                } else {
+                                  _selectedNotifications.add(notification.id);
+                                }
+                              });
                             }
-                          });
-                        }
-                      : () {
-                          // Mark notification as read if not in select mode
-                          _notificationServices
-                              .markNotificationAsRead(notification.id);
-                          setState(() {
-                            notification.isRead = true;
-                          });
-                        },
-                  trailing: _isSelectMode
-                      ? Checkbox(
-                          value:
-                              _selectedNotifications.contains(notification.id),
-                          onChanged: (bool? selected) {
-                            setState(() {
-                              if (selected == true) {
-                                _selectedNotifications.add(notification.id);
-                              } else {
-                                _selectedNotifications.remove(notification.id);
-                              }
-                            });
-                          },
-                        )
-                      : null,
+                          : () {
+                              // Mark notification as read if not in select mode
+                              _notificationServices
+                                  .markNotificationAsRead(notification.id);
+                              setState(() {
+                                final updatedNotification =
+                                    notification.copyWith(isRead: true);
+                                _notifications[index] = updatedNotification;
+                              });
+                            },
+                      trailing: _isSelectMode
+                          ? Checkbox(
+                              value: _selectedNotifications
+                                  .contains(notification.id),
+                              onChanged: (bool? selected) {
+                                setState(() {
+                                  if (selected == true) {
+                                    _selectedNotifications.add(notification.id);
+                                  } else {
+                                    _selectedNotifications
+                                        .remove(notification.id);
+                                  }
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    const Divider(height: 1), // Garis pemisah antar notifikasi
+                  ],
                 );
               },
             ),

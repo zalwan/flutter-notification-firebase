@@ -1,32 +1,18 @@
-class NotificationModel {
-  final String id;
-  final String title;
-  final String body;
-  final DateTime timestamp;
-  bool isRead;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  NotificationModel({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.timestamp,
-    this.isRead = false,
-  });
+part 'notification_model.freezed.dart';
+part 'notification_model.g.dart';
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'body': body,
-        'timestamp': timestamp.toIso8601String(),
-        'isRead': isRead,
-      };
+@freezed
+class NotificationModel with _$NotificationModel {
+  const factory NotificationModel({
+    required String id,
+    required String title,
+    required String body,
+    required DateTime timestamp,
+    @Default(false) bool isRead,
+  }) = _NotificationModel;
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>
-      NotificationModel(
-        id: json['id'],
-        title: json['title'],
-        body: json['body'],
-        timestamp: DateTime.parse(json['timestamp']),
-        isRead: json['isRead'],
-      );
+      _$NotificationModelFromJson(json);
 }
