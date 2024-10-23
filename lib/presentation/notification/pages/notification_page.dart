@@ -1,5 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Digunakan untuk format tanggal
+import 'package:intl/intl.dart';
 import 'package:notification_sample/presentation/notification/services/notification_service.dart';
 import '../models/notification_model.dart';
 
@@ -14,27 +15,29 @@ class _NotificationPageState extends State<NotificationPage> {
   late NotificationServices _notificationServices;
   List<NotificationModel> _notifications = [];
   final Set<String> _selectedNotifications = {};
-  bool _isSelectMode = false; // Menandakan apakah dalam mode pemilihan
+  bool _isSelectMode = false;
 
   @override
   void initState() {
     super.initState();
-    _notificationServices = NotificationServices(
-      onNotificationTap: _handleNotificationTap,
-    );
+    _notificationServices =
+        NotificationServices(onNotificationTap: _handleNotificationTap);
     _loadNotifications();
   }
 
   void _handleNotificationTap(String? payload) {
-    // Handle notification tap if needed
-    print('Notification tapped with payload: $payload');
+    if (kDebugMode) {
+      print('Notification tapped with payload: $payload');
+    }
   }
 
   Future<void> _loadNotifications() async {
     final notifications = await _notificationServices.getNotifications();
-    setState(() {
-      _notifications = notifications;
-    });
+    if (mounted) {
+      setState(() {
+        _notifications = notifications;
+      });
+    }
   }
 
   void _showModalOptions(BuildContext context) {
@@ -51,7 +54,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 title: const Text('Delete All Notifications'),
                 onTap: () {
                   Navigator.pop(context);
-                  _showDeleteAllConfirmation(); // Tampilkan dialog konfirmasi
+                  _showDeleteAllConfirmation();
                 },
               ),
               ListTile(
@@ -59,7 +62,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 title: const Text('Select Notifications to Delete'),
                 onTap: () {
                   Navigator.pop(context);
-                  _toggleSelectMode(); // Panggil metode untuk masuk ke mode pemilihan
+                  _toggleSelectMode();
                 },
               ),
             ],
@@ -81,17 +84,13 @@ class _NotificationPageState extends State<NotificationPage> {
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: const Text('Delete'),
-              onPressed: () async {
-                await _notificationServices.deleteAllNotifications();
-                setState(() {
-                  _notifications.clear();
-                });
-                Navigator.of(context).pop(); // Tutup dialog setelah menghapus
+              onPressed: () {
+                _deleteAllNotifications();
               },
             ),
           ],
@@ -100,9 +99,21 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+  Future<void> _deleteAllNotifications() async {
+    await _notificationServices.deleteAllNotifications();
+    if (mounted) {
+      setState(() {
+        _notifications.clear();
+      });
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
   void _toggleSelectMode() {
     setState(() {
-      _isSelectMode = !_isSelectMode; // Ubah status mode pemilihan
+      _isSelectMode = !_isSelectMode;
     });
   }
 
@@ -110,17 +121,18 @@ class _NotificationPageState extends State<NotificationPage> {
     for (String id in _selectedNotifications) {
       await _notificationServices.deleteNotification(id);
     }
-    setState(() {
-      _notifications.removeWhere(
-          (notification) => _selectedNotifications.contains(notification.id));
-      _selectedNotifications.clear();
-      _isSelectMode = false; // Keluar dari mode pemilihan setelah menghapus
-    });
+    if (mounted) {
+      setState(() {
+        _notifications.removeWhere(
+            (notification) => _selectedNotifications.contains(notification.id));
+        _selectedNotifications.clear();
+        _isSelectMode = false;
+      });
+    }
   }
 
   String _formatTimestamp(DateTime timestamp) {
-    return DateFormat('yyyy-MM-dd HH:mm')
-        .format(timestamp); // Format tanggal dan waktu
+    return DateFormat('yyyy-MM-dd HH:mm').format(timestamp);
   }
 
   @override
@@ -130,7 +142,7 @@ class _NotificationPageState extends State<NotificationPage> {
         title: const Text('Notifications'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert), // Tombol dot menu
+            icon: const Icon(Icons.more_vert),
             onPressed: () => _showModalOptions(context),
           ),
         ],
@@ -141,7 +153,6 @@ class _NotificationPageState extends State<NotificationPage> {
               itemCount: _notifications.length,
               itemBuilder: (context, index) {
                 final notification = _notifications[index];
-
                 return Column(
                   children: [
                     ListTile(
@@ -156,22 +167,17 @@ class _NotificationPageState extends State<NotificationPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8), // Jarak kecil antara teks
+                          const SizedBox(width: 8),
                           Row(children: [
-                            const Icon(
-                              Icons.circle,
-                              color: Colors.grey,
-                              size: 12,
-                            ),
+                            const Icon(Icons.circle,
+                                color: Colors.grey, size: 12),
                             const SizedBox(width: 4),
                             Text(
                               _formatTimestamp(notification.timestamp),
                               style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
+                                  fontSize: 12, color: Colors.grey),
                             ),
-                          ])
+                          ]),
                         ],
                       ),
                       subtitle: Text(notification.body),
@@ -188,9 +194,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                 }
                               });
                             }
-                          : () {
-                              // Mark notification as read if not in select mode
-                              _notificationServices
+                          : () async {
+                              await _notificationServices
                                   .markNotificationAsRead(notification.id);
                               setState(() {
                                 final updatedNotification =
@@ -215,7 +220,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             )
                           : null,
                     ),
-                    const Divider(height: 1), // Garis pemisah antar notifikasi
+                    const Divider(height: 1),
                   ],
                 );
               },
@@ -225,9 +230,9 @@ class _NotificationPageState extends State<NotificationPage> {
               onPressed: _deleteSelectedNotifications,
               label: const Text('Delete Selected'),
               icon: const Icon(Icons.delete),
-              backgroundColor: Colors.red, // Warna merah untuk tombol
+              backgroundColor: Colors.red,
             )
-          : null, // Menghilangkan FAB jika tidak dalam mode pemilihan
+          : null,
     );
   }
 }
