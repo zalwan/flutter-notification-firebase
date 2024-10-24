@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late NotificationServices _notificationServices;
   int _unreadNotificationCount = 0;
+  bool _isUpdating = false;
 
   @override
   void initState() {
@@ -25,8 +26,13 @@ class _HomePageState extends State<HomePage> {
     _updateUnreadNotificationCount();
 
     // Listen to FCM messages when app is in foreground
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _updateUnreadNotificationCount(); // Update count when new notification arrives
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (!_isUpdating) {
+        _isUpdating = true;
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _updateUnreadNotificationCount();
+        _isUpdating = false;
+      }
     });
   }
 
@@ -46,9 +52,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _updateUnreadNotificationCount() async {
     final count = await _notificationServices.getUnreadNotificationCount();
-    setState(() {
-      _unreadNotificationCount = count;
-    });
+    if (mounted) {
+      setState(() {
+        _unreadNotificationCount = count;
+      });
+    }
   }
 
   @override

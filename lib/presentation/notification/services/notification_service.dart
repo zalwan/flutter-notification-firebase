@@ -1,28 +1,33 @@
 import 'dart:convert';
+import 'dart:math';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notification_sample/presentation/notification/models/notification_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/notification_model.dart';
 
 class NotificationServices {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  final Random _random = Random();
 
   final Function(String?) onNotificationTap;
 
   NotificationServices({required this.onNotificationTap});
 
+  // Generate safe notification ID (between 0 and 2^31-1)
+  int _generateNotificationId() {
+    return _random.nextInt(pow(2, 31).toInt() - 1);
+  }
+
   Future<void> init() async {
-    // Request permission
     await _firebaseMessaging.requestPermission();
 
-    // Configure FCM listeners
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // Initialize local notifications
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings initializationSettingsIOS =
@@ -32,6 +37,7 @@ class NotificationServices {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
+
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
@@ -45,8 +51,10 @@ class NotificationServices {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    await _showLocalNotification(message);
-    await _saveNotification(message);
+    await Future.wait([
+      _showLocalNotification(message),
+      _saveNotification(message),
+    ]);
   }
 
   Future<void> _handleBackgroundMessage(RemoteMessage message) async {
@@ -64,8 +72,9 @@ class NotificationServices {
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
+    final notificationId = _generateNotificationId();
     await _flutterLocalNotificationsPlugin.show(
-      0,
+      notificationId,
       message.notification?.title ?? '',
       message.notification?.body ?? '',
       platformChannelSpecifics,
@@ -74,62 +83,110 @@ class NotificationServices {
   }
 
   Future<void> _saveNotification(RemoteMessage message) async {
-    final prefs = await SharedPreferences.getInstance();
-    final notificationModel = NotificationModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
-      timestamp: DateTime.now(),
-    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
 
-    final String notificationsJson = prefs.getString('notifications') ?? '[]';
-    final List<dynamic> notifications = jsonDecode(notificationsJson);
-    notifications.add(notificationModel.toJson());
-    await prefs.setString('notifications', jsonEncode(notifications));
+      // Create new notification model
+      final newNotification = NotificationModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: message.notification?.title ?? '',
+        body: message.notification?.body ?? '',
+        timestamp: DateTime.now(),
+        isRead: false,
+      );
+
+      // Get existing notifications
+      final String notificationsJson = prefs.getString('notifications') ?? '[]';
+      final List<dynamic> existingNotifications = jsonDecode(notificationsJson);
+
+      // Convert existing notifications to List<NotificationModel>
+      final List<NotificationModel> notifications = [
+        newNotification,
+        ...existingNotifications.map(
+            (json) => NotificationModel.fromJson(json as Map<String, dynamic>)),
+      ];
+
+      // Save updated notifications list
+      await prefs.setString(
+        'notifications',
+        jsonEncode(notifications.map((n) => n.toJson()).toList()),
+      );
+    } catch (e) {
+      print('Error saving notification: $e');
+    }
   }
 
   Future<List<NotificationModel>> getNotifications() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String notificationsJson = prefs.getString('notifications') ?? '[]';
-    final List<dynamic> notifications = jsonDecode(notificationsJson);
-    return notifications
-        .map((notification) => NotificationModel.fromJson(notification))
-        .toList();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String notificationsJson = prefs.getString('notifications') ?? '[]';
+      final List<dynamic> notifications = jsonDecode(notificationsJson);
+
+      return notifications
+          .map((json) =>
+              NotificationModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('Error getting notifications: $e');
+      return [];
+    }
   }
 
   Future<int> getUnreadNotificationCount() async {
-    final notifications = await getNotifications();
-    return notifications.where((notification) => !notification.isRead).length;
+    try {
+      final notifications = await getNotifications();
+      return notifications.where((notification) => !notification.isRead).length;
+    } catch (e) {
+      print('Error getting unread notification count: $e');
+      return 0;
+    }
   }
 
   Future<void> markNotificationAsRead(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String notificationsJson = prefs.getString('notifications') ?? '[]';
-    final List<dynamic> notifications = jsonDecode(notificationsJson);
-    final updatedNotifications = notifications.map((notification) {
-      final notificationModel = NotificationModel.fromJson(notification);
-      if (notificationModel.id == id) {
-        return notificationModel.copyWith(isRead: true);
-      }
-      return notificationModel.toJson();
-    }).toList();
-    await prefs.setString('notifications', jsonEncode(updatedNotifications));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final notifications = await getNotifications();
+
+      final updatedNotifications = notifications.map((notification) {
+        if (notification.id == id) {
+          return notification.copyWith(isRead: true);
+        }
+        return notification;
+      }).toList();
+
+      await prefs.setString(
+        'notifications',
+        jsonEncode(updatedNotifications.map((n) => n.toJson()).toList()),
+      );
+    } catch (e) {
+      print('Error marking notification as read: $e');
+    }
   }
 
   Future<void> deleteAllNotifications() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('notifications');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('notifications');
+    } catch (e) {
+      print('Error deleting all notifications: $e');
+    }
   }
 
   Future<void> deleteNotification(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String notificationsJson = prefs.getString('notifications') ?? '[]';
-    final List<dynamic> notifications = jsonDecode(notificationsJson);
-    final updatedNotifications = notifications.where((notification) {
-      final notificationModel = NotificationModel.fromJson(notification);
-      return notificationModel.id != id;
-    }).toList();
-    await prefs.setString('notifications', jsonEncode(updatedNotifications));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final notifications = await getNotifications();
+
+      final updatedNotifications =
+          notifications.where((n) => n.id != id).toList();
+
+      await prefs.setString(
+        'notifications',
+        jsonEncode(updatedNotifications.map((n) => n.toJson()).toList()),
+      );
+    } catch (e) {
+      print('Error deleting notification: $e');
+    }
   }
 }
 
