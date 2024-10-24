@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
 import 'package:notification_sample/presentation/notification/services/notification_service.dart';
 import 'package:notification_sample/presentation/notification/widgets/notification_icon.dart';
-import '../../notification/pages/notification_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {

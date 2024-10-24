@@ -23,18 +23,18 @@ class NotificationIcon extends StatelessWidget {
               right: 0,
               top: 0,
               child: Container(
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   minWidth: 16,
                   minHeight: 16,
                 ),
                 child: Text(
                   count.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
                   ),

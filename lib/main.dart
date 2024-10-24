@@ -41,8 +41,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(),
-        '/notifications': (context) => NotificationPage(),
+        '/': (context) => const HomePage(),
+        '/notifications': (context) => const NotificationPage(),
       },
     );
   }
