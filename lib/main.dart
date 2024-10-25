@@ -1,29 +1,17 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+// lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:notification_sample/presentation/home/pages/home_page.dart';
-import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
+import 'package:notification_sample/services/firebase/firebase_messaging_service.dart';
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-
-  print("Handling a background message: ${message.messageId}");
-}
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  final FCMToken = await FirebaseMessaging.instance.getToken();
-  if (kDebugMode) {
-    print('FCM Token: $FCMToken');
-  }
+  FirebaseMessagingService firebaseMessagingService =
+      FirebaseMessagingService();
+  await firebaseMessagingService.initialize();
 
   runApp(const MyApp());
 }
@@ -34,16 +22,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'FCM Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomePage(),
-        '/notifications': (context) => const NotificationPage(),
-      },
+      home: const HomePage(),
     );
   }
 }
