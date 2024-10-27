@@ -1,14 +1,33 @@
-// lib/presentation/notification/pages/notification_page.dart
 import 'package:flutter/material.dart';
 import 'package:notification_sample/services/firebase/firebase_messaging_service.dart';
 
-class NotificationPage extends StatelessWidget {
+bool isNotificationPageActive = false;
+
+class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final firebaseMessagingService = FirebaseMessagingService();
+  State<NotificationPage> createState() => _NotificationPageState();
+}
 
+class _NotificationPageState extends State<NotificationPage> {
+  final firebaseMessagingService = FirebaseMessagingService();
+
+  @override
+  void initState() {
+    super.initState();
+
+    isNotificationPageActive = true;
+  }
+
+  @override
+  void dispose() {
+    isNotificationPageActive = false;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
@@ -22,10 +41,8 @@ class NotificationPage extends StatelessWidget {
             title: Text(notification.title),
             subtitle: Text(notification.body),
             trailing: Text(
-              notification.timestamp
-                  .toLocal()
-                  .toString(), // Tampilkan timestamp
-              style: TextStyle(fontSize: 12),
+              notification.timestamp.toLocal().toString(),
+              style: const TextStyle(fontSize: 12),
             ),
           );
         },

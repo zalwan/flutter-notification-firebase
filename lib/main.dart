@@ -1,3 +1,4 @@
+// lib/main.dart
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:notification_sample/firebase_options.dart';
 import 'package:notification_sample/presentation/home/pages/home_page.dart';
 import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
 
+// Fungsi untuk menangani pesan di background
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -17,6 +19,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message body: ${message.notification?.body}');
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late AndroidNotificationChannel channel;
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 bool isFlutterLocalNotificationsInitialized = false;
@@ -44,12 +47,29 @@ Future<void> setupFlutterNotifications() async {
     badge: true,
     sound: true,
   );
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+    if (response.payload != null && !isNotificationPageActive) {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (context) => const NotificationPage()),
+      );
+    }
+  });
+
   isFlutterLocalNotificationsInitialized = true;
 }
 
 void showFlutterNotification(RemoteMessage message) {
   RemoteNotification? notification = message.notification;
   AndroidNotification? android = message.notification?.android;
+
   if (notification != null && android != null && !kIsWeb) {
     flutterLocalNotificationsPlugin.show(
       notification.hashCode,
@@ -63,11 +83,10 @@ void showFlutterNotification(RemoteMessage message) {
           icon: 'launch_background',
         ),
       ),
+      payload: 'open_notification',
     );
   }
 }
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,23 +96,20 @@ Future<void> main() async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print('FCM token: $fcmToken');
 
-  // set notification on background
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   if (!kIsWeb) {
     await setupFlutterNotifications();
   }
 
-  // set notification on terminate
-  FirebaseMessaging.instance.getInitialMessage().then((message) {
-    if (message != null) {
-      navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (context) => const NotificationPage()),
-      );
-    }
-  });
+  // FirebaseMessaging.instance.getInitialMessage().then((message) {
+  //   if (message != null && !isNotificationPageActive) {
+  //     navigatorKey.currentState?.push(
+  //       MaterialPageRoute(builder: (context) => const NotificationPage()),
+  //     );
+  //   }
+  // });
 
-  // set notification on foreground
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     showFlutterNotification(message);
     print(
@@ -101,12 +117,13 @@ Future<void> main() async {
     print('Handling a foreground message body: ${message.notification?.body}');
   });
 
-  // set notification on open app
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    navigatorKey.currentState?.push(
-      MaterialPageRoute(builder: (context) => const NotificationPage()),
-    );
-  });
+  // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  //   if (!isNotificationPageActive) {
+  //     navigatorKey.currentState?.push(
+  //       MaterialPageRoute(builder: (context) => const NotificationPage()),
+  //     );
+  //   }
+  // });
 
   runApp(const MyApp());
 }
@@ -117,7 +134,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey, // Set navigatorKey untuk navigasi global
+      navigatorKey: navigatorKey,
       title: 'FCM Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
