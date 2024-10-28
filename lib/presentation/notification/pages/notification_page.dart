@@ -1,51 +1,27 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:notification_sample/services/firebase/firebase_messaging_service.dart';
 
-bool isNotificationPageActive = false;
-
-class NotificationPage extends StatefulWidget {
+class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
-  @override
-  State<NotificationPage> createState() => _NotificationPageState();
-}
-
-class _NotificationPageState extends State<NotificationPage> {
-  final firebaseMessagingService = FirebaseMessagingService();
-
-  @override
-  void initState() {
-    super.initState();
-
-    isNotificationPageActive = true;
-  }
-
-  @override
-  void dispose() {
-    isNotificationPageActive = false;
-    super.dispose();
-  }
+  static const route = '/notification-page';
 
   @override
   Widget build(BuildContext context) {
+    final message =
+        ModalRoute.of(context)!.settings.arguments as RemoteMessage?;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text('Notification History'),
       ),
-      body: ListView.builder(
-        itemCount: firebaseMessagingService.notifications.length,
-        itemBuilder: (context, index) {
-          final notification = firebaseMessagingService.notifications[index];
-
-          return ListTile(
-            title: Text(notification.title),
-            subtitle: Text(notification.body),
-            trailing: Text(
-              notification.timestamp.toLocal().toString(),
-              style: const TextStyle(fontSize: 12),
-            ),
-          );
-        },
+      body: Center(
+        child: Column(
+          children: [
+            Text('Title: ${message?.notification?.title ?? "No Title"}'),
+            Text('Body: ${message?.notification?.body ?? "No Body"}'),
+            Text('Payload: ${message?.data.toString() ?? "No Payload"}'),
+          ],
+        ),
       ),
     );
   }

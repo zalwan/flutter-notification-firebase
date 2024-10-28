@@ -19,11 +19,7 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.notifications),
             tooltip: 'Show notifications',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const NotificationPage()),
-              );
+              Navigator.pushNamed(context, NotificationPage.route);
             },
           ),
         ],
