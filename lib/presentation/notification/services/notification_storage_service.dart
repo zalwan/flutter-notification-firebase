@@ -10,6 +10,11 @@ class NotificationStorageService {
       final prefs = await SharedPreferences.getInstance();
       final notifications = await getNotifications();
 
+      // Check if the notification already exists
+      if (notifications.any((n) => n.id == notification.id)) {
+        return;
+      }
+
       final updatedNotifications = [notification, ...notifications];
 
       await prefs.setString(
@@ -35,6 +40,11 @@ class NotificationStorageService {
       print('Error getting notifications: $e');
       return [];
     }
+  }
+
+  Future<bool> notificationExists(String id) async {
+    final notifications = await getNotifications();
+    return notifications.any((n) => n.id == id);
   }
 
   Future<void> markAsRead(String id) async {

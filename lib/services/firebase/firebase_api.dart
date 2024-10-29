@@ -18,14 +18,19 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
   }
 
   final notificationStorageService = NotificationStorageService();
+  final notificationId =
+      message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-  notificationStorageService.saveNotification(NotificationModel(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    title: message.notification?.title ?? '',
-    body: message.notification?.body ?? '',
-    timestamp: DateTime.now(),
-    isRead: false,
-  ));
+  // Check if the notification already exists
+  if (!await notificationStorageService.notificationExists(notificationId)) {
+    notificationStorageService.saveNotification(NotificationModel(
+      id: notificationId,
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      timestamp: DateTime.now(),
+      isRead: false,
+    ));
+  }
 }
 
 class FirebaseApi {
@@ -41,7 +46,7 @@ class FirebaseApi {
   final NotificationStorageService _notificationStorageService =
       NotificationStorageService();
 
-  void handlePushMessage(RemoteMessage? message) {
+  void handlePushMessage(RemoteMessage? message) async {
     if (kDebugMode) {
       print("From Foreground");
       print("Title: ${message?.notification?.title}");
@@ -50,13 +55,19 @@ class FirebaseApi {
     }
     if (message == null) return;
 
-    _notificationStorageService.saveNotification(NotificationModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
-      timestamp: DateTime.now(),
-      isRead: false,
-    ));
+    final notificationId =
+        message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
+
+    // Check if the notification already exists
+    if (!await _notificationStorageService.notificationExists(notificationId)) {
+      _notificationStorageService.saveNotification(NotificationModel(
+        id: notificationId,
+        title: message.notification?.title ?? '',
+        body: message.notification?.body ?? '',
+        timestamp: DateTime.now(),
+        isRead: false,
+      ));
+    }
 
     if (navigatorKey.currentState?.canPop() ?? false) {
       return;
@@ -100,17 +111,24 @@ class FirebaseApi {
     FirebaseMessaging.instance.getInitialMessage().then(handlePushMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(handlePushMessage);
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
-    FirebaseMessaging.onMessage.listen((message) {
+    FirebaseMessaging.onMessage.listen((message) async {
       final notification = message.notification;
       if (notification == null) return;
 
-      _notificationStorageService.saveNotification(NotificationModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: notification.title ?? '',
-        body: notification.body ?? '',
-        timestamp: DateTime.now(),
-        isRead: false,
-      ));
+      final notificationId =
+          message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Check if the notification already exists
+      if (!await _notificationStorageService
+          .notificationExists(notificationId)) {
+        _notificationStorageService.saveNotification(NotificationModel(
+          id: notificationId,
+          title: notification.title ?? '',
+          body: notification.body ?? '',
+          timestamp: DateTime.now(),
+          isRead: false,
+        ));
+      }
 
       _localNotifications.show(
         notification.hashCode,
