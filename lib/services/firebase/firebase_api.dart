@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notification_sample/main.dart';
+import 'package:notification_sample/presentation/notification/models/notification_model.dart';
 import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
+import 'package:notification_sample/presentation/notification/services/notification_storage_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -14,6 +16,16 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
     print("Body: ${message.notification?.body}");
     print("Payload: ${message.data}");
   }
+
+  final notificationStorageService = NotificationStorageService();
+
+  notificationStorageService.saveNotification(NotificationModel(
+    id: DateTime.now().millisecondsSinceEpoch.toString(),
+    title: message.notification?.title ?? '',
+    body: message.notification?.body ?? '',
+    timestamp: DateTime.now(),
+    isRead: false,
+  ));
 }
 
 class FirebaseApi {
@@ -26,6 +38,8 @@ class FirebaseApi {
   );
 
   final _localNotifications = FlutterLocalNotificationsPlugin();
+  final NotificationStorageService _notificationStorageService =
+      NotificationStorageService();
 
   void handlePushMessage(RemoteMessage? message) {
     if (kDebugMode) {
@@ -35,13 +49,21 @@ class FirebaseApi {
       print("Payload: ${message?.data}");
     }
     if (message == null) return;
+
+    _notificationStorageService.saveNotification(NotificationModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      timestamp: DateTime.now(),
+      isRead: false,
+    ));
+
     if (navigatorKey.currentState?.canPop() ?? false) {
       return;
     }
 
     navigatorKey.currentState?.pushNamed(
       NotificationPage.route,
-      arguments: message,
     );
   }
 
@@ -60,6 +82,7 @@ class FirebaseApi {
         }
       },
     );
+
     final platform = _localNotifications.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
 
@@ -81,17 +104,28 @@ class FirebaseApi {
       final notification = message.notification;
       if (notification == null) return;
 
+      _notificationStorageService.saveNotification(NotificationModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: notification.title ?? '',
+        body: notification.body ?? '',
+        timestamp: DateTime.now(),
+        isRead: false,
+      ));
+
       _localNotifications.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-                _androidChannel.id, _androidChannel.name,
-                channelDescription: _androidChannel.description,
-                icon: '@drawable/ic_launcher'),
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _androidChannel.id,
+            _androidChannel.name,
+            channelDescription: _androidChannel.description,
+            icon: '@drawable/ic_launcher',
           ),
-          payload: jsonEncode(message.toMap()));
+        ),
+        payload: jsonEncode(message.toMap()),
+      );
     });
   }
 
