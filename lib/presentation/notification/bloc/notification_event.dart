@@ -10,4 +10,6 @@ class NotificationEvent with _$NotificationEvent {
   const factory NotificationEvent.deleteAll() = _DeleteAll;
   const factory NotificationEvent.deleteNotification(String id) =
       _DeleteNotification;
+  const factory NotificationEvent.newNotification(
+      NotificationModel notification) = _NewNotification;
 }

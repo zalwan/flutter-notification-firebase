@@ -23,6 +23,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         deleteAll: (e) async => await _onDeleteAll(emit),
         deleteNotification: (e) async =>
             await _onDeleteNotification(emit, e.id),
+        newNotification: (e) async =>
+            await _onNewNotification(emit, e.notification),
       );
     });
   }
@@ -84,5 +86,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     } catch (e) {
       emit(const NotificationState.error('Failed to delete notification'));
     }
+  }
+
+  Future<void> _onNewNotification(
+      Emitter<NotificationState> emit, NotificationModel notification) async {
+    await _onSaveNotification(emit, notification);
   }
 }

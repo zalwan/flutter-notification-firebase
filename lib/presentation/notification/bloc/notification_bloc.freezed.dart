@@ -24,6 +24,7 @@ mixin _$NotificationEvent {
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -34,6 +35,7 @@ mixin _$NotificationEvent {
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -44,6 +46,7 @@ mixin _$NotificationEvent {
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -55,6 +58,7 @@ mixin _$NotificationEvent {
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -65,6 +69,7 @@ mixin _$NotificationEvent {
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -75,6 +80,7 @@ mixin _$NotificationEvent {
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -154,6 +160,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return started();
   }
@@ -167,6 +174,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return started?.call();
   }
@@ -180,6 +188,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -197,6 +206,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return started(this);
   }
@@ -210,6 +220,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return started?.call(this);
   }
@@ -223,6 +234,7 @@ class _$StartedImpl with DiagnosticableTreeMixin implements _Started {
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -334,6 +346,7 @@ class _$SaveNotificationImpl
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return saveNotification(notification);
   }
@@ -347,6 +360,7 @@ class _$SaveNotificationImpl
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return saveNotification?.call(notification);
   }
@@ -360,6 +374,7 @@ class _$SaveNotificationImpl
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (saveNotification != null) {
@@ -377,6 +392,7 @@ class _$SaveNotificationImpl
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return saveNotification(this);
   }
@@ -390,6 +406,7 @@ class _$SaveNotificationImpl
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return saveNotification?.call(this);
   }
@@ -403,6 +420,7 @@ class _$SaveNotificationImpl
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (saveNotification != null) {
@@ -481,6 +499,7 @@ class _$GetNotificationsImpl
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return getNotifications();
   }
@@ -494,6 +513,7 @@ class _$GetNotificationsImpl
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return getNotifications?.call();
   }
@@ -507,6 +527,7 @@ class _$GetNotificationsImpl
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (getNotifications != null) {
@@ -524,6 +545,7 @@ class _$GetNotificationsImpl
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return getNotifications(this);
   }
@@ -537,6 +559,7 @@ class _$GetNotificationsImpl
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return getNotifications?.call(this);
   }
@@ -550,6 +573,7 @@ class _$GetNotificationsImpl
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (getNotifications != null) {
@@ -645,6 +669,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return markAsRead(id);
   }
@@ -658,6 +683,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return markAsRead?.call(id);
   }
@@ -671,6 +697,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (markAsRead != null) {
@@ -688,6 +715,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return markAsRead(this);
   }
@@ -701,6 +729,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return markAsRead?.call(this);
   }
@@ -714,6 +743,7 @@ class _$MarkAsReadImpl with DiagnosticableTreeMixin implements _MarkAsRead {
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (markAsRead != null) {
@@ -788,6 +818,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return deleteAll();
   }
@@ -801,6 +832,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return deleteAll?.call();
   }
@@ -814,6 +846,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (deleteAll != null) {
@@ -831,6 +864,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return deleteAll(this);
   }
@@ -844,6 +878,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return deleteAll?.call(this);
   }
@@ -857,6 +892,7 @@ class _$DeleteAllImpl with DiagnosticableTreeMixin implements _DeleteAll {
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (deleteAll != null) {
@@ -955,6 +991,7 @@ class _$DeleteNotificationImpl
     required TResult Function(String id) markAsRead,
     required TResult Function() deleteAll,
     required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
   }) {
     return deleteNotification(id);
   }
@@ -968,6 +1005,7 @@ class _$DeleteNotificationImpl
     TResult? Function(String id)? markAsRead,
     TResult? Function()? deleteAll,
     TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
   }) {
     return deleteNotification?.call(id);
   }
@@ -981,6 +1019,7 @@ class _$DeleteNotificationImpl
     TResult Function(String id)? markAsRead,
     TResult Function()? deleteAll,
     TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
     required TResult orElse(),
   }) {
     if (deleteNotification != null) {
@@ -998,6 +1037,7 @@ class _$DeleteNotificationImpl
     required TResult Function(_MarkAsRead value) markAsRead,
     required TResult Function(_DeleteAll value) deleteAll,
     required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
   }) {
     return deleteNotification(this);
   }
@@ -1011,6 +1051,7 @@ class _$DeleteNotificationImpl
     TResult? Function(_MarkAsRead value)? markAsRead,
     TResult? Function(_DeleteAll value)? deleteAll,
     TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
   }) {
     return deleteNotification?.call(this);
   }
@@ -1024,6 +1065,7 @@ class _$DeleteNotificationImpl
     TResult Function(_MarkAsRead value)? markAsRead,
     TResult Function(_DeleteAll value)? deleteAll,
     TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
     required TResult orElse(),
   }) {
     if (deleteNotification != null) {
@@ -1042,6 +1084,201 @@ abstract class _DeleteNotification implements NotificationEvent {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DeleteNotificationImplCopyWith<_$DeleteNotificationImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$NewNotificationImplCopyWith<$Res> {
+  factory _$$NewNotificationImplCopyWith(_$NewNotificationImpl value,
+          $Res Function(_$NewNotificationImpl) then) =
+      __$$NewNotificationImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({NotificationModel notification});
+
+  $NotificationModelCopyWith<$Res> get notification;
+}
+
+/// @nodoc
+class __$$NewNotificationImplCopyWithImpl<$Res>
+    extends _$NotificationEventCopyWithImpl<$Res, _$NewNotificationImpl>
+    implements _$$NewNotificationImplCopyWith<$Res> {
+  __$$NewNotificationImplCopyWithImpl(
+      _$NewNotificationImpl _value, $Res Function(_$NewNotificationImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? notification = null,
+  }) {
+    return _then(_$NewNotificationImpl(
+      null == notification
+          ? _value.notification
+          : notification // ignore: cast_nullable_to_non_nullable
+              as NotificationModel,
+    ));
+  }
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $NotificationModelCopyWith<$Res> get notification {
+    return $NotificationModelCopyWith<$Res>(_value.notification, (value) {
+      return _then(_value.copyWith(notification: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _$NewNotificationImpl
+    with DiagnosticableTreeMixin
+    implements _NewNotification {
+  const _$NewNotificationImpl(this.notification);
+
+  @override
+  final NotificationModel notification;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'NotificationEvent.newNotification(notification: $notification)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'NotificationEvent.newNotification'))
+      ..add(DiagnosticsProperty('notification', notification));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NewNotificationImpl &&
+            (identical(other.notification, notification) ||
+                other.notification == notification));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, notification);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NewNotificationImplCopyWith<_$NewNotificationImpl> get copyWith =>
+      __$$NewNotificationImplCopyWithImpl<_$NewNotificationImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() started,
+    required TResult Function(NotificationModel notification) saveNotification,
+    required TResult Function() getNotifications,
+    required TResult Function(String id) markAsRead,
+    required TResult Function() deleteAll,
+    required TResult Function(String id) deleteNotification,
+    required TResult Function(NotificationModel notification) newNotification,
+  }) {
+    return newNotification(notification);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? started,
+    TResult? Function(NotificationModel notification)? saveNotification,
+    TResult? Function()? getNotifications,
+    TResult? Function(String id)? markAsRead,
+    TResult? Function()? deleteAll,
+    TResult? Function(String id)? deleteNotification,
+    TResult? Function(NotificationModel notification)? newNotification,
+  }) {
+    return newNotification?.call(notification);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? started,
+    TResult Function(NotificationModel notification)? saveNotification,
+    TResult Function()? getNotifications,
+    TResult Function(String id)? markAsRead,
+    TResult Function()? deleteAll,
+    TResult Function(String id)? deleteNotification,
+    TResult Function(NotificationModel notification)? newNotification,
+    required TResult orElse(),
+  }) {
+    if (newNotification != null) {
+      return newNotification(notification);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Started value) started,
+    required TResult Function(_SaveNotification value) saveNotification,
+    required TResult Function(_GetNotifications value) getNotifications,
+    required TResult Function(_MarkAsRead value) markAsRead,
+    required TResult Function(_DeleteAll value) deleteAll,
+    required TResult Function(_DeleteNotification value) deleteNotification,
+    required TResult Function(_NewNotification value) newNotification,
+  }) {
+    return newNotification(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Started value)? started,
+    TResult? Function(_SaveNotification value)? saveNotification,
+    TResult? Function(_GetNotifications value)? getNotifications,
+    TResult? Function(_MarkAsRead value)? markAsRead,
+    TResult? Function(_DeleteAll value)? deleteAll,
+    TResult? Function(_DeleteNotification value)? deleteNotification,
+    TResult? Function(_NewNotification value)? newNotification,
+  }) {
+    return newNotification?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Started value)? started,
+    TResult Function(_SaveNotification value)? saveNotification,
+    TResult Function(_GetNotifications value)? getNotifications,
+    TResult Function(_MarkAsRead value)? markAsRead,
+    TResult Function(_DeleteAll value)? deleteAll,
+    TResult Function(_DeleteNotification value)? deleteNotification,
+    TResult Function(_NewNotification value)? newNotification,
+    required TResult orElse(),
+  }) {
+    if (newNotification != null) {
+      return newNotification(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _NewNotification implements NotificationEvent {
+  const factory _NewNotification(final NotificationModel notification) =
+      _$NewNotificationImpl;
+
+  NotificationModel get notification;
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$NewNotificationImplCopyWith<_$NewNotificationImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

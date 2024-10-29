@@ -13,6 +13,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+    // Trigger initial loading of notifications
+    context.read<NotificationBloc>().add(NotificationEvent.started());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -23,27 +30,27 @@ class _HomePageState extends State<HomePage> {
               int notificationCount = 0;
               state.maybeWhen(
                 loaded: (notifications) {
-                  notificationCount = notifications
-                      .where((n) => !n.isRead)
-                      .length; // Hanya yang belum dibaca
+                  notificationCount =
+                      notifications.where((n) => !n.isRead).length;
                 },
                 orElse: () {},
               );
 
-              return badges.Badge(
-                badgeAnimation: const badges.BadgeAnimation.scale(),
-                position: badges.BadgePosition.topEnd(top: 2, end: 4),
-                badgeContent: Text(
-                  notificationCount.toString(),
-                  style: const TextStyle(color: Colors.white),
+              return IconButton(
+                icon: badges.Badge(
+                  showBadge: notificationCount > 0,
+                  badgeAnimation: const badges.BadgeAnimation.scale(),
+                  position: badges.BadgePosition.topEnd(top: -10, end: -8),
+                  badgeContent: Text(
+                    notificationCount.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  child: const Icon(Icons.notifications),
                 ),
-                child: IconButton(
-                  icon: const Icon(Icons.notifications),
-                  tooltip: 'Show notifications',
-                  onPressed: () {
-                    Navigator.pushNamed(context, NotificationPage.route);
-                  },
-                ),
+                tooltip: 'Show notifications',
+                onPressed: () {
+                  Navigator.pushNamed(context, NotificationPage.route);
+                },
               );
             },
           ),

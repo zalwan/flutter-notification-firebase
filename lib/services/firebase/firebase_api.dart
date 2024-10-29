@@ -1,9 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notification_sample/main.dart';
+import 'package:notification_sample/presentation/notification/bloc/notification_bloc.dart';
 import 'package:notification_sample/presentation/notification/models/notification_model.dart';
 import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
 import 'package:notification_sample/presentation/notification/services/notification_storage_service.dart';
@@ -21,7 +22,6 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
   final notificationId =
       message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-  // Check if the notification already exists
   if (!await notificationStorageService.notificationExists(notificationId)) {
     notificationStorageService.saveNotification(NotificationModel(
       id: notificationId,
@@ -30,6 +30,18 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
       timestamp: DateTime.now(),
       isRead: false,
     ));
+  }
+
+  final context = navigatorKey.currentContext;
+  if (context != null) {
+    BlocProvider.of<NotificationBloc>(context)
+        .add(NotificationEvent.newNotification(NotificationModel(
+      id: notificationId,
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      timestamp: DateTime.now(),
+      isRead: false,
+    )));
   }
 }
 
@@ -58,24 +70,25 @@ class FirebaseApi {
     final notificationId =
         message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-    // Check if the notification already exists
     if (!await _notificationStorageService.notificationExists(notificationId)) {
-      _notificationStorageService.saveNotification(NotificationModel(
+      final notificationModel = NotificationModel(
         id: notificationId,
         title: message.notification?.title ?? '',
         body: message.notification?.body ?? '',
         timestamp: DateTime.now(),
         isRead: false,
-      ));
-    }
+      );
 
-    if (navigatorKey.currentState?.canPop() ?? false) {
-      return;
-    }
+      _notificationStorageService.saveNotification(notificationModel);
 
-    navigatorKey.currentState?.pushNamed(
-      NotificationPage.route,
-    );
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        BlocProvider.of<NotificationBloc>(context)
+            .add(NotificationEvent.newNotification(notificationModel));
+
+        navigatorKey.currentState?.pushNamed(NotificationPage.route);
+      }
+    }
   }
 
   Future initLocalNotifications() async {
@@ -90,6 +103,8 @@ class FirebaseApi {
         if (payload != null) {
           final message = RemoteMessage.fromMap(jsonDecode(payload));
           handlePushMessage(message);
+
+          navigatorKey.currentState?.pushNamed(NotificationPage.route);
         }
       },
     );
@@ -118,16 +133,27 @@ class FirebaseApi {
       final notificationId =
           message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-      // Check if the notification already exists
       if (!await _notificationStorageService
           .notificationExists(notificationId)) {
-        _notificationStorageService.saveNotification(NotificationModel(
+        final notificationModel = NotificationModel(
           id: notificationId,
           title: notification.title ?? '',
           body: notification.body ?? '',
           timestamp: DateTime.now(),
           isRead: false,
-        ));
+        );
+
+        _notificationStorageService.saveNotification(notificationModel);
+
+        final context = navigatorKey.currentContext;
+        if (context != null) {
+          BlocProvider.of<NotificationBloc>(context)
+              .add(NotificationEvent.newNotification(notificationModel));
+
+          // navigatorKey.currentState?.pushNamed(
+          //   NotificationPage.route,
+          // );
+        }
       }
 
       _localNotifications.show(
