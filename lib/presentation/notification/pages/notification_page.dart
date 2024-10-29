@@ -9,7 +9,6 @@ class NotificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Memanggil event getNotifications saat halaman dibuka
     context
         .read<NotificationBloc>()
         .add(const NotificationEvent.getNotifications());
@@ -22,7 +21,6 @@ class NotificationPage extends StatelessWidget {
             icon: const Icon(Icons.delete),
             tooltip: 'Delete All Notifications',
             onPressed: () {
-              // Memanggil event untuk menghapus semua notifikasi
               context
                   .read<NotificationBloc>()
                   .add(const NotificationEvent.deleteAll());
@@ -43,25 +41,24 @@ class NotificationPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final notification = notifications[index];
                   return ListTile(
+                    tileColor:
+                        notification.isRead ? Colors.white : Colors.grey[300],
                     title: Text(notification.title),
                     subtitle: Text(notification.body),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () {
-                        // Memanggil event untuk menghapus notifikasi tertentu
                         context.read<NotificationBloc>().add(
                             NotificationEvent.deleteNotification(
                                 notification.id));
                       },
                     ),
                     onTap: () {
-                      // Memanggil event untuk menandai notifikasi sebagai dibaca
                       if (!notification.isRead) {
                         context
                             .read<NotificationBloc>()
                             .add(NotificationEvent.markAsRead(notification.id));
                       }
-                      // Lakukan aksi lain jika diperlukan
                     },
                   );
                 },
