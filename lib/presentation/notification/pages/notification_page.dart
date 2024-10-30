@@ -42,83 +42,102 @@ class _NotificationPageState extends State<NotificationPage> {
             loading: (_) => const Center(child: CircularProgressIndicator()),
             loaded: (loadedState) {
               final notifications = loadedState.notifications;
-              return ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  return ListTile(
-                    leading: const Icon(Icons.notifications_active),
-                    tileColor:
-                        notification.isRead ? Colors.white : Colors.grey[200],
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Info',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final notification = notifications[index];
+                        return ListTile(
+                          leading: const Icon(Icons.notifications_active),
+                          tileColor: notification.isRead
+                              ? Colors.white
+                              : Colors.grey[200],
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Info',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    DateFormat('dd MMM yyyy • HH:mm')
+                                        .format(notification.timestamp),
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              DateFormat('dd MMM yyyy • HH:mm')
-                                  .format(notification.timestamp),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
+                              Text(
+                                notification.title,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                               ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          notification.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 2),
+                              Text(notification.body),
+                              const SizedBox(height: 8),
+                              const Divider(
+                                height: 0,
+                                thickness: 0,
+                                indent: 0,
+                                endIndent: 0,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                          trailing: isDeleting
+                              ? Checkbox(
+                                  value: selectedNotificationIds
+                                      .contains(notification.id),
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value == true) {
+                                        selectedNotificationIds
+                                            .add(notification.id);
+                                      } else {
+                                        selectedNotificationIds
+                                            .remove(notification.id);
+                                      }
+                                    });
+                                  },
+                                )
+                              : null,
+                          onTap: () {
+                            if (!notification.isRead) {
+                              context.read<NotificationBloc>().add(
+                                    NotificationEvent.markAsRead(
+                                        notification.id),
+                                  );
+                            }
+                          },
+                        );
+                      },
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 2),
-                        Text(notification.body),
-                        const SizedBox(height: 8),
-                        const Divider(
-                          height: 0,
-                          thickness: 0,
-                          indent: 0,
-                          endIndent: 0,
-                          color: Colors.grey,
-                        ),
-                      ],
+                  ),
+                  if (isDeleting)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: _cancelSelection,
+                        child: const Text('Cancel'),
+                      ),
                     ),
-                    trailing: isDeleting
-                        ? Checkbox(
-                            value: selectedNotificationIds
-                                .contains(notification.id),
-                            onChanged: (bool? value) {
-                              setState(() {
-                                if (value == true) {
-                                  selectedNotificationIds.add(notification.id);
-                                } else {
-                                  selectedNotificationIds
-                                      .remove(notification.id);
-                                }
-                              });
-                            },
-                          )
-                        : null,
-                    onTap: () {
-                      if (!notification.isRead) {
-                        context.read<NotificationBloc>().add(
-                              NotificationEvent.markAsRead(notification.id),
-                            );
-                      }
-                    },
-                  );
-                },
+                ],
               );
             },
             error: (errorState) => Center(child: Text(errorState.message)),
@@ -133,6 +152,11 @@ class _NotificationPageState extends State<NotificationPage> {
                         NotificationEvent.deleteNotification(id),
                       );
                 }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Selected notifications deleted'),
+                  ),
+                );
                 setState(() {
                   selectedNotificationIds.clear();
                   isDeleting = false;
@@ -174,10 +198,37 @@ class _NotificationPageState extends State<NotificationPage> {
                 leading: const Icon(Icons.delete_forever),
                 title: const Text('Delete All Notifications'),
                 onTap: () {
-                  context
-                      .read<NotificationBloc>()
-                      .add(const NotificationEvent.deleteAll());
-                  Navigator.pop(context);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirm Deletion'),
+                        content: const Text(
+                          'Are you sure you want to delete all notifications?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              context
+                                  .read<NotificationBloc>()
+                                  .add(const NotificationEvent.deleteAll());
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('All notifications deleted'),
+                                ),
+                              );
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('No'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
             ],
@@ -185,5 +236,12 @@ class _NotificationPageState extends State<NotificationPage> {
         );
       },
     );
+  }
+
+  void _cancelSelection() {
+    setState(() {
+      isDeleting = false;
+      selectedNotificationIds.clear();
+    });
   }
 }
