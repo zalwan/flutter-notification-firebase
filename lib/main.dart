@@ -12,12 +12,8 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Inisialisasi NotificationBloc
   final notificationBloc = NotificationBloc(NotificationStorageService());
-
-  // Pass the NotificationBloc instance to FirebaseApi
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi(notificationBloc: notificationBloc).initNotifications();
 
   runApp(
