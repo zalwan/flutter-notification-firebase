@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:notification_sample/presentation/notification/bloc/notification_bloc.dart';
 import 'package:notification_sample/presentation/notification/models/notification_model.dart';
-import 'package:notification_sample/presentation/notification/pages/notification_page_detail.dart'; // Import halaman detail
+import 'package:notification_sample/presentation/notification/pages/notification_page_detail.dart';
 
 class NotificationTile extends StatelessWidget {
   final NotificationModel notification;
@@ -111,6 +111,10 @@ class NotificationTile extends StatelessWidget {
   }
 
   void _handleTap(BuildContext context) {
+    if (isDeleting) {
+      return;
+    }
+
     if (!notification.isRead) {
       context.read<NotificationBloc>().add(
             NotificationEvent.markAsRead(notification.id),
