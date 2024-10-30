@@ -74,7 +74,8 @@ class _NotificationPageState extends State<NotificationPage> {
             loading: (_) => const Center(child: CircularProgressIndicator()),
             loaded: (loadedState) => Stack(
               children: [
-                Expanded(
+                SizedBox(
+                  height: double.infinity,
                   child: NotificationList(
                     notifications: loadedState.notifications,
                     isDeleting: isDeleting,
