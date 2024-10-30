@@ -72,7 +72,7 @@ class _NotificationPageState extends State<NotificationPage> {
             initial: (_) =>
                 const Center(child: Text('Welcome to Notifications')),
             loading: (_) => const Center(child: CircularProgressIndicator()),
-            loaded: (loadedState) => Column(
+            loaded: (loadedState) => Stack(
               children: [
                 Expanded(
                   child: NotificationList(
@@ -83,17 +83,20 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                 ),
                 if (isDeleting)
-                  DeletionControls(
-                    selectedIds: selectedNotificationIds,
-                    onSelectionChanged: (newSelection) {
-                      setState(() {
-                        selectedNotificationIds = newSelection;
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: DeletionControls(
+                      selectedIds: selectedNotificationIds,
+                      onSelectionChanged: (newSelection) {
+                        setState(() {
+                          selectedNotificationIds = newSelection;
 
-                        if (selectedNotificationIds.isEmpty) {
-                          _toggleDeletionMode(false);
-                        }
-                      });
-                    },
+                          if (selectedNotificationIds.isEmpty) {
+                            _toggleDeletionMode(false);
+                          }
+                        });
+                      },
+                    ),
                   ),
               ],
             ),
