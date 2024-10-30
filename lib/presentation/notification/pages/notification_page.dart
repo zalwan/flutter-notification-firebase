@@ -138,8 +138,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   isDeleting = false;
                 });
               },
-              child: const Icon(Icons.delete),
               tooltip: 'Delete Selected Notifications',
+              child: const Icon(Icons.delete),
             )
           : null,
     );
