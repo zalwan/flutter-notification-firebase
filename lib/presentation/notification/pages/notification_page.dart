@@ -30,6 +30,8 @@ class NotificationPage extends StatelessWidget {
       ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
+          // print('Current NotificationState: $state');
+
           return state.map(
             initial: (_) =>
                 const Center(child: Text('Welcome to Notifications')),
@@ -49,15 +51,16 @@ class NotificationPage extends StatelessWidget {
                       icon: const Icon(Icons.delete),
                       onPressed: () {
                         context.read<NotificationBloc>().add(
-                            NotificationEvent.deleteNotification(
-                                notification.id));
+                              NotificationEvent.deleteNotification(
+                                  notification.id),
+                            );
                       },
                     ),
                     onTap: () {
                       if (!notification.isRead) {
-                        context
-                            .read<NotificationBloc>()
-                            .add(NotificationEvent.markAsRead(notification.id));
+                        context.read<NotificationBloc>().add(
+                              NotificationEvent.markAsRead(notification.id),
+                            );
                       }
                     },
                   );

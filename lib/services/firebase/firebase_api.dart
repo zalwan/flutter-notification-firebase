@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notification_sample/main.dart';
-import 'package:notification_sample/presentation/notification/bloc/notification_bloc.dart';
 import 'package:notification_sample/presentation/notification/models/notification_model.dart';
 import 'package:notification_sample/presentation/notification/pages/notification_page.dart';
 import 'package:notification_sample/presentation/notification/services/notification_storage_service.dart';
+import 'package:notification_sample/presentation/notification/bloc/notification_bloc.dart';
 
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -31,22 +30,11 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
       isRead: false,
     ));
   }
-
-  final context = navigatorKey.currentContext;
-  if (context != null) {
-    BlocProvider.of<NotificationBloc>(context)
-        .add(NotificationEvent.newNotification(NotificationModel(
-      id: notificationId,
-      title: message.notification?.title ?? '',
-      body: message.notification?.body ?? '',
-      timestamp: DateTime.now(),
-      isRead: false,
-    )));
-  }
 }
 
 class FirebaseApi {
-  final _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final NotificationBloc notificationBloc;
   final _androidChannel = const AndroidNotificationChannel(
     'high_importance_channel',
     'High Importance Notifications',
@@ -57,6 +45,8 @@ class FirebaseApi {
   final _localNotifications = FlutterLocalNotificationsPlugin();
   final NotificationStorageService _notificationStorageService =
       NotificationStorageService();
+
+  FirebaseApi({required this.notificationBloc});
 
   void handlePushMessage(RemoteMessage? message) async {
     if (kDebugMode) {
@@ -71,7 +61,7 @@ class FirebaseApi {
         message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
     if (!await _notificationStorageService.notificationExists(notificationId)) {
-      final notificationModel = NotificationModel(
+      final newNotification = NotificationModel(
         id: notificationId,
         title: message.notification?.title ?? '',
         body: message.notification?.body ?? '',
@@ -79,16 +69,18 @@ class FirebaseApi {
         isRead: false,
       );
 
-      _notificationStorageService.saveNotification(notificationModel);
+      _notificationStorageService.saveNotification(newNotification);
 
-      final context = navigatorKey.currentContext;
-      if (context != null) {
-        BlocProvider.of<NotificationBloc>(context)
-            .add(NotificationEvent.newNotification(notificationModel));
-
-        navigatorKey.currentState?.pushNamed(NotificationPage.route);
-      }
+      notificationBloc.add(NotificationEvent.newNotification(newNotification));
     }
+
+    if (navigatorKey.currentState?.canPop() ?? false) {
+      return;
+    }
+
+    navigatorKey.currentState?.pushNamed(
+      NotificationPage.route,
+    );
   }
 
   Future initLocalNotifications() async {
@@ -103,8 +95,6 @@ class FirebaseApi {
         if (payload != null) {
           final message = RemoteMessage.fromMap(jsonDecode(payload));
           handlePushMessage(message);
-
-          navigatorKey.currentState?.pushNamed(NotificationPage.route);
         }
       },
     );
@@ -135,7 +125,7 @@ class FirebaseApi {
 
       if (!await _notificationStorageService
           .notificationExists(notificationId)) {
-        final notificationModel = NotificationModel(
+        final newNotification = NotificationModel(
           id: notificationId,
           title: notification.title ?? '',
           body: notification.body ?? '',
@@ -143,17 +133,10 @@ class FirebaseApi {
           isRead: false,
         );
 
-        _notificationStorageService.saveNotification(notificationModel);
+        _notificationStorageService.saveNotification(newNotification);
 
-        final context = navigatorKey.currentContext;
-        if (context != null) {
-          BlocProvider.of<NotificationBloc>(context)
-              .add(NotificationEvent.newNotification(notificationModel));
-
-          // navigatorKey.currentState?.pushNamed(
-          //   NotificationPage.route,
-          // );
-        }
+        notificationBloc
+            .add(NotificationEvent.newNotification(newNotification));
       }
 
       _localNotifications.show(

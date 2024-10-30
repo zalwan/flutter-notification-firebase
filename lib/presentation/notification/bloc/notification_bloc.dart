@@ -44,7 +44,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     emit(const NotificationState.loading());
     try {
       await _storageService.saveNotification(notification);
-      await _onGetNotifications(emit); // Reuse the method to load notifications
+      await _onGetNotifications(emit);
     } catch (e) {
       emit(const NotificationState.error('Failed to save notification'));
     }
@@ -63,7 +63,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   Future<void> _onMarkAsRead(Emitter<NotificationState> emit, String id) async {
     try {
       await _storageService.markAsRead(id);
-      await _onGetNotifications(emit); // Reuse the method to load notifications
+      await _onGetNotifications(emit);
     } catch (e) {
       emit(const NotificationState.error('Failed to mark as read'));
     }
@@ -82,7 +82,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       Emitter<NotificationState> emit, String id) async {
     try {
       await _storageService.deleteNotification(id);
-      await _onGetNotifications(emit); // Reuse the method to load notifications
+      await _onGetNotifications(emit);
     } catch (e) {
       emit(const NotificationState.error('Failed to delete notification'));
     }
@@ -91,5 +91,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   Future<void> _onNewNotification(
       Emitter<NotificationState> emit, NotificationModel notification) async {
     await _onSaveNotification(emit, notification);
+    await _onGetNotifications(emit);
   }
 }
