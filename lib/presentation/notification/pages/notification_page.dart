@@ -9,7 +9,7 @@ class NotificationPage extends StatefulWidget {
   static const route = '/notification-page';
 
   @override
-  _NotificationPageState createState() => _NotificationPageState();
+  State<NotificationPage> createState() => _NotificationPageState();
 }
 
 class _NotificationPageState extends State<NotificationPage> {
